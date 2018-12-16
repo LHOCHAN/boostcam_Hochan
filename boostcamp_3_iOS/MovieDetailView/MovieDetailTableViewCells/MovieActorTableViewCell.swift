@@ -10,18 +10,16 @@ import UIKit
 
 class MovieActorTableViewCell: UITableViewCell {
     
+    // MARK: - IBOutlets
+
     @IBOutlet weak var movieDirectorLabel: UILabel!
     @IBOutlet weak var movieActorLabel: UILabel!
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
+    // MARK: - Methods
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    func configure(data: MovieDetail) {
+        movieDirectorLabel.text = data.director
+        movieActorLabel.text = data.actor
     }
 
 }

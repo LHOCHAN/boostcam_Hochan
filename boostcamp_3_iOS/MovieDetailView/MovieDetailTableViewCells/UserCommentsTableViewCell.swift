@@ -10,21 +10,20 @@ import UIKit
 
 class UserCommentsTableViewCell: UITableViewCell {
 
+    // MARK: - IBOutlets
+
     @IBOutlet weak var userNameLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var userContentsLabel: UILabel!
-    @IBOutlet weak var starRatingControl: StarRatingControl!
+    @IBOutlet weak var starRatingControl: StarRatingControlView!
     
+    // MARK: - Methods
+
+    func configure(data: UserComment) {
+        userNameLabel.text = data.writer
+        userContentsLabel.text = data.contents
+        dateLabel.text = data.timestampFormatted
+        starRatingControl.rating = data.rating
+    }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
 }

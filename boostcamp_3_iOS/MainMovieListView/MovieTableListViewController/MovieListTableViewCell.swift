@@ -18,16 +18,12 @@ class MovieListTableViewCell: UITableViewCell {
     @IBOutlet weak var movieFullRateLabel: UILabel!
     @IBOutlet weak var movieDateLabel: UILabel!
 
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    func configure(data: MovieList) {
+        movieTitleLabel.text = data.title
+        movieFullRateLabel.text = data.tFullRate
+        movieDateLabel.text = "개봉일 : " + data.date
+        movieGradeImageView.image = UIImage(named: data.gradeImageString)
+        movieImageView.image = #imageLiteral(resourceName: "img_placeholder")
     }
 
 }

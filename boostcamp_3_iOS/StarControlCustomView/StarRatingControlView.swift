@@ -8,7 +8,7 @@
 
 import UIKit
 
-class StarRatingControl: UIStackView {
+class StarRatingControlView: UIStackView {
 
     // MARK: - Properties
     
@@ -26,25 +26,18 @@ class StarRatingControl: UIStackView {
     
     // Add ImageView to StackView
     private func setupStars() {
-        
         for _ in 0..<5 {
-            
             let imageView = UIImageView()
-            
             imageView.translatesAutoresizingMaskIntoConstraints = false
-            
             addArrangedSubview(imageView)
-            
             ratingImages.append(imageView)
         }
     }
     
     private func updateStarImageStates() {
-        
         var rateCal = rating / 2
         
         for index in 0..<5 {
-            
             if rateCal < 0.5 {
                 ratingImages[index].image = UIImage(named:"ic_star_large")
             } else if 0.5 <= rateCal && rateCal < 1 {
@@ -52,11 +45,8 @@ class StarRatingControl: UIStackView {
             } else {
                 ratingImages[index].image = UIImage(named: "ic_star_large_full")
             }
-            
             rateCal -= 1
-            
         }
-        
     }
 
 }

@@ -17,12 +17,11 @@ class MovieDetailViewController: UIViewController {
     
     // MARK: - Properties
     
-    let cellIdentifier = "UserCommentsTableViewCell"
-
     var id: String?
     var movieName: String?
     var movieDetail: MovieDetail?
-    var userCommentArr: [UserComment] = [UserComment]()
+    var movieImage: UIImage?
+    var userComments: [UserComment] = [UserComment]()
     
     // MARK: - LifeCycles
 
@@ -35,16 +34,12 @@ class MovieDetailViewController: UIViewController {
         tableView.register(UINib(nibName: "MovieDetailTableViewCell", bundle: nil), forCellReuseIdentifier: "MovieDetailTableViewCell")
         tableView.tableFooterView?.backgroundColor = UIColor.gray
 
-//        self.navigationController?.navigationBar.topItem?.title = "영화목록"
         self.navigationItem.title = movieName
         
         activityIndicator.startAnimating()
         
         getMovieDetailData()
         getUserCommentsData()
-        
-        
-        // Do any additional setup after loading the view.
     }
     
     
@@ -61,36 +56,33 @@ class MovieDetailViewController: UIViewController {
         let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
             if let error = error {
                 print(error.localizedDescription)
+                self.dataError()
                 return
             }
             
-            guard let data = data else {
-                return
-            }
+            guard let data = data else { return self.dataError() }
             
             do {
                 self.movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
-                
-                
                 DispatchQueue.main.async {
                     self.activityIndicator.stopAnimating()
                     self.tableView.reloadData()
                 }
                 
+                DispatchQueue.global().async {
+                    if let movieDetail = self.movieDetail {
+                        guard let imageURL: URL = URL(string: movieDetail.image) else { return }
+                        guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
+                        self.movieImage = UIImage(data: imageData)
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    }
+                }
             } catch (let err) {
                 print(err.localizedDescription)
                 
-                // failAlert
-                DispatchQueue.main.async {
-                    let alert = UIAlertController(title: "네트워크 오류", message: "데이터 수신에 실패하였습니다.", preferredStyle: .alert)
-                    
-                    let ok = UIAlertAction(title: "확인", style: .default) { _ in
-                        _ = self.navigationController?.popViewController(animated: true)
-                    }
-                    
-                    alert.addAction(ok)
-                    self.present(alert, animated: true, completion: nil)
-                }
+                self.dataError()
             }
         }
         
@@ -107,61 +99,39 @@ class MovieDetailViewController: UIViewController {
         let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
             if let error = error {
                 print(error.localizedDescription)
+                self.dataError()
                 return
             }
             
-            guard let data = data else {
-                return
-            }
+            guard let data = data else { return self.dataError() }
             
             do {
                 let apiResponse: UserCommentAPIResponse = try JSONDecoder().decode(UserCommentAPIResponse.self, from: data)
-                self.userCommentArr = apiResponse.comments
+                self.userComments = apiResponse.comments
                 
                 DispatchQueue.main.async {
                     self.activityIndicator.stopAnimating()
                     self.tableView.reloadData()
-                    
-                   
                 }
-                
             } catch (let err) {
                 print(err.localizedDescription)
-                
-                // failAlert
-                DispatchQueue.main.async {
-                    let alert = UIAlertController(title: "네트워크 오류", message: "데이터 수신에 실패하였습니다.", preferredStyle: .alert)
-                    
-                    let ok = UIAlertAction(title: "확인", style: .default) { _ in
-                        _ = self.navigationController?.popViewController(animated: true)
-                    }
-                    
-                    alert.addAction(ok)
-                    self.present(alert, animated: true, completion: nil)
-                }
-                
-                
+                self.dataError()
             }
         }
-        
         dataTask.resume()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func dataError() {
+        networkErrorAlert() { _ in
+            self.navigationController?.popViewController(animated: true)
+        }
     }
-    */
-
+    
 }
 
+// MARK: - TableView
+
 extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource {
-    
 
     // MARK: TableViewDataSource
 
@@ -171,7 +141,7 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 4 {
-            return userCommentArr.count
+            return userComments.count
         } else {
             return 1
         }
@@ -181,91 +151,69 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
         
         switch indexPath.section {
         case 0:
+            // DetialCell
             guard let cell: MovieDetailTableViewCell = tableView.dequeueReusableCell(withIdentifier: "MovieDetailTableViewCell", for: indexPath) as? MovieDetailTableViewCell else { return UITableViewCell() }
             
-            if let movieDetail = movieDetail {
-                cell.movieTitleLabel.text = movieDetail.title
-                cell.movieDateLabel.text = movieDetail.date
-                cell.movieGradeImageView.image = UIImage(named: movieDetail.gradeImageString)
-                cell.movieGenreDurationLabel.text = movieDetail.genreDuration
-                cell.movieRatingLabel.text = String(movieDetail.userRating)
-                cell.movieReserveGradeRateLabel.text = movieDetail.reservationGradeRate
-                cell.movieImageView.image = #imageLiteral(resourceName: "img_placeholder")
-                cell.starRatingControl.rating = movieDetail.userRating
-                cell.movieAudienceLabel.text = movieDetail.audienceFormatted
-
-                
-                cell.imageTapClosure = {
-                    
-                    if let presentedViewController = self.storyboard?.instantiateViewController(withIdentifier: "MovieDetailImageViewController") as? MovieDetailImageViewController {
-                        presentedViewController.providesPresentationContextTransitionStyle = true
-                        presentedViewController.definesPresentationContext = true
-                        presentedViewController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-                        presentedViewController.movieImage = cell.movieImageView.image
-                        
-                        self.present(presentedViewController, animated: true, completion: nil)
-                    }
-                    
-                }
-                
-                DispatchQueue.global().async {
-                    guard let imageURL: URL = URL(string: movieDetail.image) else { return }
-                    guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
-                    DispatchQueue.main.async {
-                        cell.movieImageView.image = UIImage(data: imageData)
-                    }
-                }
+            if let movieDetail = self.movieDetail {
+                cell.configure(data: movieDetail)
             }
             
+            if let movieImage = movieImage {
+                cell.movieImageView.image = movieImage
+
+            }
             
-            
+            // 영화 이미지 탭할경우 모달
+            cell.imageTapClosure = {
+                if let presentedViewController = self.storyboard?.instantiateViewController(withIdentifier: "MovieDetailImageViewController") as? MovieDetailImageViewController {
+                    presentedViewController.movieImage = cell.movieImageView.image
+                    self.present(presentedViewController, animated: true, completion: nil)
+                }
+            }
             return cell
             
         case 1:
+            // SynopsisCell
             guard let cell: MovieSynopsisTableViewCell = tableView.dequeueReusableCell(withIdentifier: "MovieSynopsisTableViewCell", for: indexPath) as? MovieSynopsisTableViewCell else { return UITableViewCell() }
             
-            cell.movieSynopsisLabel.text = movieDetail?.synopsis
-            
+            if let movieDetail = self.movieDetail {
+                cell.configure(data: movieDetail)
+            }
             return cell
             
         case 2:
+            // ActorCell
             guard let cell: MovieActorTableViewCell = tableView.dequeueReusableCell(withIdentifier: "MovieActorTableViewCell", for: indexPath) as? MovieActorTableViewCell else { return UITableViewCell() }
             
-            cell.movieDirectorLabel.text = movieDetail?.director
-            cell.movieActorLabel.text = movieDetail?.actor
-            
+            if let movieDetail = self.movieDetail {
+                cell.configure(data: movieDetail)
+            }
             return cell
             
         case 3:
-            guard let cell: WriteCommentTableViewCell = tableView.dequeueReusableCell(withIdentifier: "WriteCommentTableViewCell", for: indexPath) as?
-                WriteCommentTableViewCell else { return UITableViewCell() }
+            // WriteCommentCell
+            guard let cell: WriteCommentTableViewCell = tableView.dequeueReusableCell(withIdentifier: "WriteCommentTableViewCell", for: indexPath) as? WriteCommentTableViewCell else { return UITableViewCell() }
             
             return cell
             
         default:
-            guard let cell: UserCommentsTableViewCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? UserCommentsTableViewCell else { return UITableViewCell() }
+            // UserCommentsCell
+            guard let cell: UserCommentsTableViewCell = tableView.dequeueReusableCell(withIdentifier: "UserCommentsTableViewCell", for: indexPath) as? UserCommentsTableViewCell else { return UITableViewCell() }
             
-            let userComment = userCommentArr[indexPath.row]
-            
-            cell.userNameLabel.text = userComment.writer
-            cell.userContentsLabel.text = userComment.contents
-            cell.dateLabel.text = userComment.timestampFormatted
-            DispatchQueue.main.async {
-                cell.starRatingControl.rating = userComment.rating
-                
-            }
+            cell.configure(data: userComments[indexPath.row])
             
             return cell
         }
     }
     
-    
     // MARK: TableViewDelegate
 
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
-            return 265
+            if tableView.bounds.size.width * 0.7 < 265 {
+                return 265
+            }
+            return tableView.bounds.size.width * 0.7
         }
         return UITableView.automaticDimension
     }
@@ -278,23 +226,14 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        
         if section == 3 || section == 4 {
-            return 0
+            return CGFloat.leastNonzeroMagnitude
         }
         return 8
     }
-   
     
-//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//
-//
-//        return headerView
-//    }
-    
-//    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return
-//    }
-    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return CGFloat.leastNonzeroMagnitude
+    }
     
 }

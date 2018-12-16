@@ -243,12 +243,12 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="PMM-WW-ibC">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="PMM-WW-ibC">
                                 <rect key="frame" x="0.0" y="64" width="375" height="554"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MovieSynopsisTableViewCell" rowHeight="77" id="5zU-Kv-Gdh" customClass="MovieSynopsisTableViewCell" customModule="boostcamp_3_iOS" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="77"/>
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="77"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="5zU-Kv-Gdh" id="9gJ-pX-yAX">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="77"/>
@@ -282,7 +282,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MovieActorTableViewCell" rowHeight="101" id="jif-ti-p2U" customClass="MovieActorTableViewCell" customModule="boostcamp_3_iOS" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="105" width="375" height="101"/>
+                                        <rect key="frame" x="0.0" y="132.5" width="375" height="101"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jif-ti-p2U" id="H6M-dh-6ve">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="101"/>
@@ -348,7 +348,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="WriteCommentTableViewCell" rowHeight="44" id="6ZV-4c-SEn" customClass="WriteCommentTableViewCell" customModule="boostcamp_3_iOS" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="206" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="233.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6ZV-4c-SEn" id="ZxT-aj-cvq">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -375,12 +375,14 @@
                                                 <constraint firstItem="tpg-Q4-far" firstAttribute="leading" secondItem="ZxT-aj-cvq" secondAttribute="leading" constant="14" id="JzJ-88-7YB"/>
                                                 <constraint firstItem="g4D-xD-krE" firstAttribute="centerY" secondItem="tpg-Q4-far" secondAttribute="centerY" id="ROy-lz-b7e"/>
                                                 <constraint firstItem="g4D-xD-krE" firstAttribute="leading" secondItem="tpg-Q4-far" secondAttribute="trailing" constant="14" id="UUC-xx-kag"/>
+                                                <constraint firstItem="tpg-Q4-far" firstAttribute="top" secondItem="ZxT-aj-cvq" secondAttribute="top" constant="10" id="Y8V-u6-jcK"/>
+                                                <constraint firstAttribute="bottom" secondItem="tpg-Q4-far" secondAttribute="bottom" constant="10" id="YSw-WK-IR8"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="UserCommentsTableViewCell" rowHeight="143" id="BKR-4r-u1U" customClass="UserCommentsTableViewCell" customModule="boostcamp_3_iOS" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="250" width="375" height="143"/>
+                                        <rect key="frame" x="0.0" y="277.5" width="375" height="143"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="BKR-4r-u1U" id="L1D-Tj-V9M">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="143"/>
@@ -404,7 +406,7 @@
                                                                     <nil key="textColor"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
-                                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="9zq-TC-v7k" customClass="StarRatingControl" customModule="boostcamp_3_iOS" customModuleProvider="target">
+                                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="9zq-TC-v7k" customClass="StarRatingControlView" customModule="boostcamp_3_iOS" customModuleProvider="target">
                                                                     <rect key="frame" x="43.5" y="0.0" width="100" height="20"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" secondItem="9zq-TC-v7k" secondAttribute="height" multiplier="5:1" id="N5e-BX-Ojn"/>

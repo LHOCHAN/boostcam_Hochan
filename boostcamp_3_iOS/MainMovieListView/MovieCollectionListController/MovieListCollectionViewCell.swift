@@ -10,7 +10,6 @@ import UIKit
 
 class MovieListCollectionViewCell: UICollectionViewCell {
     
-    
     // MARK: - IBOutlets
     
     @IBOutlet weak var movieImageView: UIImageView!
@@ -19,5 +18,14 @@ class MovieListCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var movieFullRateLabel: UILabel!
     @IBOutlet weak var movieDateLabel: UILabel!
     
+    // MARK: - Methods
+    
+    func configure(data: MovieList) {
+        movieTitleLabel.text = data.title
+        movieFullRateLabel.text = data.cFullRate
+        movieDateLabel.text = data.date
+        movieGradeImageView.image = UIImage(named: data.gradeImageString)
+        movieImageView.image = #imageLiteral(resourceName: "img_placeholder")
+    }
     
 }

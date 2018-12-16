@@ -10,7 +10,6 @@ import UIKit
 
 class MovieDetailImageViewController: UIViewController {
     
-    
     // MARK: - IBOutlets
     
     @IBOutlet weak var movieImageView: UIImageView!
@@ -20,7 +19,9 @@ class MovieDetailImageViewController: UIViewController {
     
     var movieImage: UIImage?
     
-   
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
     
     // MARK: - LifeCycle
 
@@ -28,45 +29,18 @@ class MovieDetailImageViewController: UIViewController {
         super.viewDidLoad()
 
         scrollView.delegate = self
-        
         movieImageView.image = movieImage
-        
-//        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapImgView(_:)))
-//        self.movieImageView.addGestureRecognizer(tapGesture)
-
-        // Do any additional setup after loading the view.
     }
     
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
-    
-    
-    // MARK: - Methods
-    
-//    @objc func tapImgView(_ sender: UITapGestureRecognizer) {
-//
-//        if self.navigationController?.isNavigationBarHidden == true {
-//            self.view.backgroundColor = UIColor.white
-//            self.tabBarController?.tabBar.isHidden = false
-//            self.navigationController?.isNavigationBarHidden = false
-//        } else {
-//            self.view.backgroundColor = UIColor.black
-//            self.tabBarController?.tabBar.isHidden = true
-//            self.navigationController?.isNavigationBarHidden = true
-//        }
-//
-//    }
-    
-    
-    // MARK: IBActions
+    // MARK: - IBActions
     
     @IBAction func actionDismiss(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
     
-
 }
+
+// MARK: - UIScrollViewDelegate
 
 extension MovieDetailImageViewController: UIScrollViewDelegate {
     

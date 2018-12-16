@@ -11,10 +11,8 @@ import Foundation
 class MovieListData {
     
     static let shared: MovieListData = MovieListData()
-    var movieListArr: [MovieList] = [MovieList]()
-    
+    var movieLists: [MovieList] = [MovieList]()
     var cache: NSCache<AnyObject, AnyObject>? = NSCache()
-    
     var sortRule = orderType.reservationRate
         
     enum orderType: Int {

@@ -9,18 +9,15 @@
 import UIKit
 
 class MovieSynopsisTableViewCell: UITableViewCell {
+    
+    // MARK: - IBOutlets
 
     @IBOutlet weak var movieSynopsisLabel: UILabel!
+    
+    // MARK: - Methods
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    func configure(data: MovieDetail) {
+        movieSynopsisLabel.text = data.synopsis
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
+    
 }
