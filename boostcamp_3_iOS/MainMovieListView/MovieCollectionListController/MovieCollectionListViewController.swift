@@ -73,15 +73,20 @@ class MovieCollectionListViewController: UIViewController {
     }
     
     func getMovieListData() {
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
         MovieStaticMethods.getMovieData { isSucced in
             if !isSucced {
                 self.networkErrorAlert()
                 DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     self.activityIndicator.stopAnimating()
                 }
                 return
             }
             DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 self.navigationTitle = MovieListData.shared.sortRule.name()
                 self.activityIndicator.stopAnimating()
                 self.collectionView.reloadData()

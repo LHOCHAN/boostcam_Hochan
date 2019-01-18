@@ -49,11 +49,12 @@ class MovieDetailViewController: UIViewController {
     // MARK: - Methods
 
     func getMovieDetailData() {
-        
         guard let url = URL(string: movieURL + "\(id ?? "")") else {
             return
         }
-        
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
         let session: URLSession = URLSession(configuration: .default)
         let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
             if let error = error {
@@ -67,6 +68,7 @@ class MovieDetailViewController: UIViewController {
             do {
                 self.movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
                 DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     self.activityIndicator.stopAnimating()
                     self.tableView.reloadData()
                 }
@@ -96,7 +98,9 @@ class MovieDetailViewController: UIViewController {
         guard let url = URL(string: commentsURL + "\(id ?? "")") else {
             return
         }
-        
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
         let session: URLSession = URLSession(configuration: .default)
         let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
             if let error = error {
@@ -112,6 +116,7 @@ class MovieDetailViewController: UIViewController {
                 self.userComments = apiResponse.comments
                 
                 DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     self.activityIndicator.stopAnimating()
                     self.tableView.reloadData()
                 }
@@ -126,6 +131,7 @@ class MovieDetailViewController: UIViewController {
     func dataError() {
         networkErrorAlert() { _ in
             self.navigationController?.popViewController(animated: true)
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
         }
     }
     
