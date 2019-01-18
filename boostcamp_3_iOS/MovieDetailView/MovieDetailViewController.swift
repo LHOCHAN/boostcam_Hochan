@@ -22,7 +22,8 @@ class MovieDetailViewController: UIViewController {
     var movieDetail: MovieDetail?
     var movieImage: UIImage?
     var userComments: [UserComment] = [UserComment]()
-    let url = "http://connect-boxoffice.run.goorm.io/movie?id="
+    let movieURL = "http://connect-boxoffice.run.goorm.io/movie?id="
+    let commentsURL = "http://connect-boxoffice.run.goorm.io/comments?movie_id="
     
     // MARK: - LifeCycles
 
@@ -49,7 +50,7 @@ class MovieDetailViewController: UIViewController {
 
     func getMovieDetailData() {
         
-        guard let url = URL(string: url + "\(id ?? "")") else {
+        guard let url = URL(string: movieURL + "\(id ?? "")") else {
             return
         }
         
@@ -92,7 +93,7 @@ class MovieDetailViewController: UIViewController {
     
     func getUserCommentsData() {
     
-        guard let url = URL(string: url + "\(id ?? "")") else {
+        guard let url = URL(string: commentsURL + "\(id ?? "")") else {
             return
         }
         
