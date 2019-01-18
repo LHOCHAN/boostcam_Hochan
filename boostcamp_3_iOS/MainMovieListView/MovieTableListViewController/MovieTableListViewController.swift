@@ -129,13 +129,12 @@ extension MovieTableListViewController: UITableViewDelegate, UITableViewDataSour
                 guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
                 
                 DispatchQueue.main.async {
-                    if let index: IndexPath = tableView.indexPath(for: cell) {
-                        if index.row == indexPath.row {
-                            if let movieImage = UIImage(data: imageData) {
-                                cell.movieImageView.image = movieImage
-                                MovieListData.shared.cache?.setObject(movieImage, forKey: (indexPath as NSIndexPath).row as AnyObject)
-                            }
-                        }
+                    guard let index: IndexPath = tableView.indexPath(for: cell) else {
+                        return
+                    }
+                    if index.row == index.row, let movieImage = UIImage(data: imageData) {
+                        cell.movieImageView.image = movieImage
+                        MovieListData.shared.cache?.setObject(movieImage, forKey: (indexPath as NSIndexPath).row as AnyObject)
                     }
                 }
             }
