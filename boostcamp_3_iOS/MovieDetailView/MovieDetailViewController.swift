@@ -22,6 +22,7 @@ class MovieDetailViewController: UIViewController {
     var movieDetail: MovieDetail?
     var movieImage: UIImage?
     var userComments: [UserComment] = [UserComment]()
+    let url = "http://connect-boxoffice.run.goorm.io/movie?id="
     
     // MARK: - LifeCycles
 
@@ -31,7 +32,7 @@ class MovieDetailViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        tableView.register(UINib(nibName: "MovieDetailTableViewCell", bundle: nil), forCellReuseIdentifier: "MovieDetailTableViewCell")
+        tableView.register(UINib(nibName: CellIdentifier.MovieDetailTableViewCell, bundle: nil), forCellReuseIdentifier: CellIdentifier.MovieDetailTableViewCell)
         tableView.tableFooterView?.backgroundColor = UIColor.gray
 
         self.navigationItem.title = movieName
@@ -48,7 +49,7 @@ class MovieDetailViewController: UIViewController {
 
     func getMovieDetailData() {
         
-        guard let url = URL(string: "http://connect-boxoffice.run.goorm.io/movie?id=\(id ?? "")") else {
+        guard let url = URL(string: url + "\(id ?? "")") else {
             return
         }
         
@@ -91,7 +92,7 @@ class MovieDetailViewController: UIViewController {
     
     func getUserCommentsData() {
     
-        guard let url = URL(string: "http://connect-boxoffice.run.goorm.io/comments?movie_id=\(id ?? "")") else {
+        guard let url = URL(string: url + "\(id ?? "")") else {
             return
         }
         
@@ -152,7 +153,7 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
         switch indexPath.section {
         case 0:
             // DetialCell
-            guard let cell: MovieDetailTableViewCell = tableView.dequeueReusableCell(withIdentifier: "MovieDetailTableViewCell", for: indexPath) as? MovieDetailTableViewCell else { return UITableViewCell() }
+            guard let cell: MovieDetailTableViewCell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.MovieDetailTableViewCell, for: indexPath) as? MovieDetailTableViewCell else { return UITableViewCell() }
             
             if let movieDetail = self.movieDetail {
                 cell.configure(data: movieDetail)
@@ -165,7 +166,7 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
             
             // 영화 이미지 탭할경우 모달
             cell.imageTapClosure = {
-                if let presentedViewController = self.storyboard?.instantiateViewController(withIdentifier: "MovieDetailImageViewController") as? MovieDetailImageViewController {
+                if let presentedViewController = self.storyboard?.instantiateViewController(withIdentifier: CellIdentifier.MovieDetailImageViewController) as? MovieDetailImageViewController {
                     presentedViewController.movieImage = cell.movieImageView.image
                     self.present(presentedViewController, animated: true, completion: nil)
                 }
@@ -174,7 +175,7 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
             
         case 1:
             // SynopsisCell
-            guard let cell: MovieSynopsisTableViewCell = tableView.dequeueReusableCell(withIdentifier: "MovieSynopsisTableViewCell", for: indexPath) as? MovieSynopsisTableViewCell else { return UITableViewCell() }
+            guard let cell: MovieSynopsisTableViewCell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.MovieSynopsisTableViewCell, for: indexPath) as? MovieSynopsisTableViewCell else { return UITableViewCell() }
             
             if let movieDetail = self.movieDetail {
                 cell.configure(data: movieDetail)
@@ -183,7 +184,7 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
             
         case 2:
             // ActorCell
-            guard let cell: MovieActorTableViewCell = tableView.dequeueReusableCell(withIdentifier: "MovieActorTableViewCell", for: indexPath) as? MovieActorTableViewCell else { return UITableViewCell() }
+            guard let cell: MovieActorTableViewCell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.MovieActorTableViewCell, for: indexPath) as? MovieActorTableViewCell else { return UITableViewCell() }
             
             if let movieDetail = self.movieDetail {
                 cell.configure(data: movieDetail)
@@ -192,13 +193,13 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
             
         case 3:
             // WriteCommentCell
-            guard let cell: WriteCommentTableViewCell = tableView.dequeueReusableCell(withIdentifier: "WriteCommentTableViewCell", for: indexPath) as? WriteCommentTableViewCell else { return UITableViewCell() }
+            guard let cell: WriteCommentTableViewCell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.WriteCommentTableViewCell, for: indexPath) as? WriteCommentTableViewCell else { return UITableViewCell() }
             
             return cell
             
         default:
             // UserCommentsCell
-            guard let cell: UserCommentsTableViewCell = tableView.dequeueReusableCell(withIdentifier: "UserCommentsTableViewCell", for: indexPath) as? UserCommentsTableViewCell else { return UITableViewCell() }
+            guard let cell: UserCommentsTableViewCell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.UserCommentsTableViewCell, for: indexPath) as? UserCommentsTableViewCell else { return UITableViewCell() }
             
             cell.configure(data: userComments[indexPath.row])
             
@@ -236,4 +237,15 @@ extension MovieDetailViewController: UITableViewDelegate, UITableViewDataSource 
         return CGFloat.leastNonzeroMagnitude
     }
     
+}
+
+extension MovieDetailViewController {
+    struct CellIdentifier {
+        static let MovieDetailTableViewCell = "MovieDetailTableViewCell"
+        static let MovieDetailImageViewController = "MovieDetailImageViewController"
+        static let MovieSynopsisTableViewCell = "MovieSynopsisTableViewCell"
+        static let MovieActorTableViewCell = "MovieActorTableViewCell"
+        static let WriteCommentTableViewCell = "WriteCommentTableViewCell"
+        static let UserCommentsTableViewCell = "UserCommentsTableViewCell"
+    }
 }
