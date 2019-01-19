@@ -20,7 +20,13 @@ class MovieDetailViewController: UIViewController {
     var id: String?
     var movieName: String?
     var movieDetail: MovieDetail?
-    var movieImage: UIImage?
+    var movieImage: UIImage? {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadData()
+            }
+        }
+    }
     var userComments: [UserComment] = [UserComment]()
     
     // MARK: - LifeCycles
@@ -69,14 +75,9 @@ class MovieDetailViewController: UIViewController {
                     self.tableView.reloadData()
                 }
                 
-                DispatchQueue.global().async {
-                    if let movieDetail = self.movieDetail {
-                        guard let imageURL: URL = URL(string: movieDetail.image) else { return }
-                        guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
-                        self.movieImage = UIImage(data: imageData)
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
+                DispatchQueue.global().async { [weak self] in
+                    if let movieDetail = self?.movieDetail {
+                        self?.imageFetch(imageUrl: movieDetail.image)
                     }
                 }
             } catch (let err) {
@@ -127,7 +128,29 @@ class MovieDetailViewController: UIViewController {
         }
     }
     
+    func imageFetch(imageUrl: String) {
+        guard let imageURL: URL = URL(string: imageUrl ) else {
+            return
+        }
+        if (MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString) != nil) {
+            self.movieImage = MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString)
+        } else {
+            DispatchQueue.global().async {
+                guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
+                DispatchQueue.main.async { [weak self] in
+                    if let movieImage = UIImage(data: imageData) {
+                        self?.movieImage = movieImage
+                        MovieListData.shared.cache?.setObject(movieImage, forKey: imageURL.absoluteString as NSString)
+                    }
+                }
+            }
+        }
+        
+    }
+    
 }
+
+
 
 // MARK: - TableView
 

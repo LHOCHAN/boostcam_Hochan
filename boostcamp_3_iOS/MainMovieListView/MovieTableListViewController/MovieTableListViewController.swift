@@ -49,6 +49,11 @@ class MovieTableListViewController: UIViewController {
         tableView.reloadData()
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        MovieListData.shared.cache?.removeAllObjects()
+    }
+    
     // MARK: - Methods
     
     @objc func refreshOptions(sender: UIRefreshControl) {
@@ -116,11 +121,14 @@ extension MovieTableListViewController: UITableViewDelegate, UITableViewDataSour
         let movieList = MovieListData.shared.movieLists[indexPath.row]
         cell.configure(data: movieList)
         
-        if (MovieListData.shared.cache?.object(forKey: (indexPath as NSIndexPath).row as AnyObject) != nil) {
-            cell.movieImageView.image = MovieListData.shared.cache?.object(forKey: (indexPath as NSIndexPath).row as AnyObject) as? UIImage
+        guard let imageURL: URL = URL(string: movieList.thumb) else { return UITableViewCell()}
+        
+        if (MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString) != nil) {
+            print("cache")
+            cell.movieImageView.image = MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString)
         } else {
+            print("not cache")
             DispatchQueue.global().async {
-                guard let imageURL: URL = URL(string: movieList.thumb) else { return }
                 guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
                 
                 DispatchQueue.main.async {
@@ -128,7 +136,7 @@ extension MovieTableListViewController: UITableViewDelegate, UITableViewDataSour
                         if index.row == indexPath.row {
                             if let movieImage = UIImage(data: imageData) {
                                 cell.movieImageView.image = movieImage
-                                MovieListData.shared.cache?.setObject(movieImage, forKey: (indexPath as NSIndexPath).row as AnyObject)
+                                MovieListData.shared.cache?.setObject(movieImage, forKey: imageURL.absoluteString as NSString)
                             }
                         }
                     }

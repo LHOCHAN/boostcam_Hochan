@@ -11,8 +11,6 @@ import UIKit
 class MovieStaticMethods {
     
     static func getMovieData(completion: @escaping (_ isSucceed: Bool) -> Void) {
-        // 전에 저장되있던 캐시 이미지 삭제
-        MovieListData.shared.cache?.removeAllObjects()
         
         let orderType = MovieListData.shared.sortRule.rawValue
         guard let url = URL(string: "http://connect-boxoffice.run.goorm.io/movies?order_type=\(orderType)") else { return }
