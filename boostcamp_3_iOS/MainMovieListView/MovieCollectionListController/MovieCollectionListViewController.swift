@@ -78,8 +78,12 @@ class MovieCollectionListViewController: UIViewController {
     }
     
     func getMovieListData() {
-        MovieStaticMethods.getMovieData { isSucced in
-            if !isSucced {
+        MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieListRequest , parameterValue: MovieListData.shared.sortRule.rawValue) { (isSucced, movieList: MovieListAPIResopnse?, error) in
+            if isSucced {
+                if let movieList = movieList?.movies {
+                    MovieListData.shared.movieLists = movieList
+                }
+            } else {
                 self.networkErrorAlert()
                 DispatchQueue.main.async {
                     self.activityIndicator.stopAnimating()
@@ -138,12 +142,11 @@ extension MovieCollectionListViewController: UICollectionViewDataSource {
         cell.configure(data: movieList)
         
         guard let imageURL: URL = URL(string: movieList.thumb) else { return UICollectionViewCell() }
+        
         if (MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString) != nil) {
-            
             cell.movieImageView.image = MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString)
             
         } else {
-            
             DispatchQueue.global().async {
                 guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
                 DispatchQueue.main.async {

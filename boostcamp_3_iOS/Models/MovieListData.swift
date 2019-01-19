@@ -16,10 +16,10 @@ class MovieListData {
     var cache: NSCache<NSString, UIImage>? = NSCache()
     var sortRule = orderType.reservationRate
         
-    enum orderType: Int {
-        case reservationRate = 0
-        case curation
-        case openingDate
+    enum orderType: String {
+        case reservationRate = "0"
+        case curation = "1"
+        case openingDate = "2"
     
         func name() -> String {
             switch self {

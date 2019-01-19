@@ -53,73 +53,65 @@ class MovieDetailViewController: UIViewController {
     // MARK: - Methods
 
     func getMovieDetailData() {
-        
-        guard let url = URL(string: "http://connect-boxoffice.run.goorm.io/movie?id=\(id ?? "")") else {
-            return
-        }
-        
-        let session: URLSession = URLSession(configuration: .default)
-        let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
+        MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieDetailInfoRequest, parameterValue: id ?? "") { [weak self] (isSuccess, movieDetail: MovieDetail?, error) in
+            
             if let error = error {
-                print(error.localizedDescription)
-                self.dataError()
-                return
+                self?.dataError()
             }
             
-            guard let data = data else { return self.dataError() }
-            
-            do {
-                self.movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
-                DispatchQueue.main.async {
-                    self.activityIndicator.stopAnimating()
-                    self.tableView.reloadData()
-                }
-                
-                DispatchQueue.global().async { [weak self] in
-                    if let movieDetail = self?.movieDetail {
-                        self?.imageFetch(imageUrl: movieDetail.image)
+            if isSuccess {
+                if let movieDetail = movieDetail {
+                    self?.movieDetail = movieDetail
+                    
+                    DispatchQueue.main.async {
+                        self?.activityIndicator.stopAnimating()
                     }
+                    
+                    DispatchQueue.global().async {
+                        if let movieDetail = self?.movieDetail {
+                            guard let imageURL: URL = URL(string: movieDetail.image) else { return }
+                            guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
+                            self?.movieImage = UIImage(data: imageData)
+                        }
+                    }
+                    
                 }
-            } catch (let err) {
-                print(err.localizedDescription)
-                
-                self.dataError()
+            }else {
+                DispatchQueue.main.async {
+                    self?.activityIndicator.stopAnimating()
+                    self?.dataError()
+                }
             }
+            
         }
-        
-        dataTask.resume()
     }
     
     func getUserCommentsData() {
-    
-        guard let url = URL(string: "http://connect-boxoffice.run.goorm.io/comments?movie_id=\(id ?? "")") else {
-            return
-        }
         
-        let session: URLSession = URLSession(configuration: .default)
-        let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
+        
+        MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieCommentRequest, parameterValue: id ?? "") { [weak self] (isSuccess, userComment: UserCommentAPIResponse?, error) in
+            
             if let error = error {
-                print(error.localizedDescription)
-                self.dataError()
-                return
+              self?.dataError()
             }
             
-            guard let data = data else { return self.dataError() }
-            
-            do {
-                let apiResponse: UserCommentAPIResponse = try JSONDecoder().decode(UserCommentAPIResponse.self, from: data)
-                self.userComments = apiResponse.comments
-                
-                DispatchQueue.main.async {
-                    self.activityIndicator.stopAnimating()
-                    self.tableView.reloadData()
+            if isSuccess{
+                if let userComments = userComment {
+                    self?.userComments = userComments.comments
+                    
+                    DispatchQueue.main.async {
+                        self?.activityIndicator.stopAnimating()
+                        self?.tableView.reloadData()
+                    }
                 }
-            } catch (let err) {
-                print(err.localizedDescription)
-                self.dataError()
+                
+            } else {
+                DispatchQueue.main.async {
+                    self?.activityIndicator.stopAnimating()
+                    self?.dataError()
+                }
             }
         }
-        dataTask.resume()
     }
     
     func dataError() {

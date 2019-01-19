@@ -62,8 +62,12 @@ class MovieTableListViewController: UIViewController {
     }
     
     func getMovieListData() {
-        MovieStaticMethods.getMovieData { isSucced in
-            if !isSucced {
+        MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieListRequest , parameterValue: MovieListData.shared.sortRule.rawValue) { (isSucced, movieList: MovieListAPIResopnse?, error) in
+            if isSucced {
+                if let movieList = movieList?.movies {
+                    MovieListData.shared.movieLists = movieList
+                }
+            } else {
                 self.networkErrorAlert()
                 DispatchQueue.main.async {
                     self.activityIndicator.stopAnimating()
@@ -124,10 +128,8 @@ extension MovieTableListViewController: UITableViewDelegate, UITableViewDataSour
         guard let imageURL: URL = URL(string: movieList.thumb) else { return UITableViewCell()}
         
         if (MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString) != nil) {
-            print("cache")
             cell.movieImageView.image = MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString)
         } else {
-            print("not cache")
             DispatchQueue.global().async {
                 guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
                 
