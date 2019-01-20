@@ -78,6 +78,9 @@ class MovieCollectionListViewController: UIViewController {
     }
     
     func getMovieListData() {
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
         MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieListRequest , parameterValue: MovieListData.shared.sortRule.rawValue) { (isSucced, movieList: MovieListAPIResopnse?, error) in
             if isSucced {
                 if let movieList = movieList?.movies {
@@ -86,11 +89,13 @@ class MovieCollectionListViewController: UIViewController {
             } else {
                 self.networkErrorAlert()
                 DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     self.activityIndicator.stopAnimating()
                 }
                 return
             }
             DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 self.navigationTitle = MovieListData.shared.sortRule.name()
                 self.activityIndicator.stopAnimating()
                 self.collectionView.reloadData()
@@ -150,8 +155,12 @@ extension MovieCollectionListViewController: UICollectionViewDataSource {
             DispatchQueue.global().async {
                 guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
                 DispatchQueue.main.async {
+                    guard let index: IndexPath = collectionView.indexPath(for: cell) else {
+                        return
+                    }
                     
-                    if let index: IndexPath = collectionView.indexPath(for: cell) {
+                    
+                   
                         if index.row == indexPath.row {
                             
                             if let movieImage = UIImage(data: imageData) {
@@ -160,7 +169,7 @@ extension MovieCollectionListViewController: UICollectionViewDataSource {
                                 MovieListData.shared.cache?.setObject(movieImage, forKey: imageURL.absoluteString as NSString)
                             }
                         }
-                    }
+                    
                 }
             }
         }

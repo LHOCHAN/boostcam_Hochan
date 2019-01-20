@@ -62,6 +62,9 @@ class MovieTableListViewController: UIViewController {
     }
     
     func getMovieListData() {
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
         MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieListRequest , parameterValue: MovieListData.shared.sortRule.rawValue) { (isSucced, movieList: MovieListAPIResopnse?, error) in
             if isSucced {
                 if let movieList = movieList?.movies {
@@ -70,11 +73,13 @@ class MovieTableListViewController: UIViewController {
             } else {
                 self.networkErrorAlert()
                 DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     self.activityIndicator.stopAnimating()
                 }
                 return
             }
             DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 self.navigationTitle = MovieListData.shared.sortRule.name()
                 self.activityIndicator.stopAnimating()
                 self.tableView.reloadData()
@@ -134,14 +139,17 @@ extension MovieTableListViewController: UITableViewDelegate, UITableViewDataSour
                 guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
                 
                 DispatchQueue.main.async {
-                    if let index: IndexPath = tableView.indexPath(for: cell) {
+                    guard let index: IndexPath = tableView.indexPath(for: cell) else {
+                        return
+                    }
+                    
                         if index.row == indexPath.row {
                             if let movieImage = UIImage(data: imageData) {
                                 cell.movieImageView.image = movieImage
                                 MovieListData.shared.cache?.setObject(movieImage, forKey: imageURL.absoluteString as NSString)
                             }
                         }
-                    }
+                    
                 }
             }
         }
