@@ -20,7 +20,13 @@ class MovieDetailViewController: UIViewController {
     var id: String?
     var movieName: String?
     var movieDetail: MovieDetail?
-    var movieImage: UIImage?
+    var movieImage: UIImage? {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadData()
+            }
+        }
+    }
     var userComments: [UserComment] = [UserComment]()
     let movieURL = "http://connect-boxoffice.run.goorm.io/movie?id="
     let commentsURL = "http://connect-boxoffice.run.goorm.io/comments?movie_id="
@@ -49,83 +55,78 @@ class MovieDetailViewController: UIViewController {
     // MARK: - Methods
 
     func getMovieDetailData() {
-        guard let url = URL(string: movieURL + "\(id ?? "")") else {
-            return
-        }
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
-        let session: URLSession = URLSession(configuration: .default)
-        let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
+
+        MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieDetailInfoRequest, parameterValue: id ?? "") { [weak self] (isSuccess, movieDetail: MovieDetail?, error) in
+
             if let error = error {
-                print(error.localizedDescription)
-                self.dataError()
-                return
+                self?.dataError()
             }
             
-            guard let data = data else { return self.dataError() }
-            
-            do {
-                self.movieDetail = try JSONDecoder().decode(MovieDetail.self, from: data)
-                DispatchQueue.main.async {
-                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
-                    self.activityIndicator.stopAnimating()
-                    self.tableView.reloadData()
-                }
-                
-                DispatchQueue.global().async {
-                    if let movieDetail = self.movieDetail {
-                        guard let imageURL: URL = URL(string: movieDetail.image) else { return }
-                        guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
-                        self.movieImage = UIImage(data: imageData)
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
+
+            if isSuccess {
+                if let movieDetail = movieDetail {
+                    self?.movieDetail = movieDetail
+                    
+                    DispatchQueue.main.async {
+                        UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                        self.activityIndicator.stopAnimating()
+                        self.tableView.reloadData()
+                    }
+                    
+                    DispatchQueue.global().async {
+                        if let movieDetail = self?.movieDetail {
+                            guard let imageURL: URL = URL(string: movieDetail.image) else { return }
+                            guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
+                            self?.movieImage = UIImage(data: imageData)
                         }
                     }
+                    
                 }
-            } catch (let err) {
-                print(err.localizedDescription)
-                
-                self.dataError()
+            } else {
+                DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                    self?.activityIndicator.stopAnimating()
+                    self?.dataError()
+                }
             }
+            
         }
-        
-        dataTask.resume()
     }
     
     func getUserCommentsData() {
     
-        guard let url = URL(string: commentsURL + "\(id ?? "")") else {
-            return
-        }
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
-        let session: URLSession = URLSession(configuration: .default)
-        let dataTask: URLSessionDataTask = session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
+   
+        MovieStaticMethods.shared.movieInfoRequest(requestType: RequestType.movieCommentRequest, parameterValue: id ?? "") { [weak self] (isSuccess, userComment: UserCommentAPIResponse?, error) in
+            
             if let error = error {
-                print(error.localizedDescription)
-                self.dataError()
-                return
+              self?.dataError()
             }
             
-            guard let data = data else { return self.dataError() }
-            
-            do {
-                let apiResponse: UserCommentAPIResponse = try JSONDecoder().decode(UserCommentAPIResponse.self, from: data)
-                self.userComments = apiResponse.comments
+            if isSuccess{
+                if let userComments = userComment {
+                    self?.userComments = userComments.comments
+                    
+                    DispatchQueue.main.async {
+                        UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                        self?.activityIndicator.stopAnimating()
+                        self?.tableView.reloadData()
+                    }
+                }
                 
+            } else {
                 DispatchQueue.main.async {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
-                    self.activityIndicator.stopAnimating()
-                    self.tableView.reloadData()
+                    self?.activityIndicator.stopAnimating()
+                    self?.dataError()
                 }
-            } catch (let err) {
-                print(err.localizedDescription)
-                self.dataError()
             }
         }
-        dataTask.resume()
     }
     
     func dataError() {
@@ -135,7 +136,29 @@ class MovieDetailViewController: UIViewController {
         }
     }
     
+    func imageFetch(imageUrl: String) {
+        guard let imageURL: URL = URL(string: imageUrl ) else {
+            return
+        }
+        if (MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString) != nil) {
+            self.movieImage = MovieListData.shared.cache?.object(forKey: imageURL.absoluteString as NSString)
+        } else {
+            DispatchQueue.global().async {
+                guard let imageData: Data = try? Data(contentsOf: imageURL) else { return }
+                DispatchQueue.main.async { [weak self] in
+                    if let movieImage = UIImage(data: imageData) {
+                        self?.movieImage = movieImage
+                        MovieListData.shared.cache?.setObject(movieImage, forKey: imageURL.absoluteString as NSString)
+                    }
+                }
+            }
+        }
+        
+    }
+    
 }
+
+
 
 // MARK: - TableView
 
